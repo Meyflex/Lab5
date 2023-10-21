@@ -8,16 +8,46 @@ public class StateAndReward {
 		
 		/* State discretization function for the angle controller */
 	public static String getStateHover(double angle, double vx, double vy) {
-	    int angleState = discretize(angle, 10, -Math.PI, Math.PI);  // 10 states for angle
-	    int vxState = discretize(vx, 5, -2500, 2500);  // 5 states for vx
-	    int vyState = discretize(vy, 5, -2500, 2500);  // 5 states for vy
-	    
-	    return angleState + ":" + vxState + ":" + vyState;
+	    int angleState = discretize(angle, 11, -Math.PI, Math.PI);  // 10 states for angle
+	    int vxState = discretize(vx, 5, -1, 1);  // 5 states for vx
+	    int vyState = discretize(vy, 5, -1, 1);  // 5 states for vy	 
+	    String state = String.valueOf(angleState) + ":" + String.valueOf(vxState) + ":" + String.valueOf(vyState);
+	
+	    return state;
 	}
 	public static double getRewardHover(double angle, double vx, double vy) {
-	    double positionPenalty =Math.abs(vy);  
-	    
-	    return  -positionPenalty;  // negative because we want to minimize these
+	    double positionPenalty = -Math.abs(vy);  
+	    double anglePenalty = getRewardAngle(angle,vx,vy);
+	    if (angle> 0 && angle<0.1) {
+	    	anglePenalty += 6;
+		    if (angle> 0 && angle<0.05) {
+		    	anglePenalty +=7;
+		    	if (angle> 0 && angle<0.01) {
+		    		anglePenalty +=9;
+		    	
+				    if (Math.abs(vx)> 0 && Math.abs(vx)<0.2 ) {
+				    	anglePenalty +=5;
+				    
+					    if (Math.abs(vx)> 0 && Math.abs(vx)<0.1 ) {
+					    	anglePenalty +=5;
+					    }
+					    if (Math.abs(vy)> 0 && Math.abs(vy)<1) {
+					    	positionPenalty +=6;
+					    
+						    if (Math.abs(vy)> 0 && Math.abs(vy)<0.5) {
+						    	positionPenalty +=10;
+					   
+							    if (Math.abs(vy)> 0 && Math.abs(vy)<0.1) {
+							    	positionPenalty +=12;
+							    }
+						    }
+				    }
+				    }
+		    	}
+		    }
+	    }
+	   
+	        return positionPenalty + anglePenalty;    
 	}
 	public static String getStateAngle(double angle, double vx, double vy) {
 	    int angleState = discretize(angle, 10, -1, 1);

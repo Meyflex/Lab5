@@ -94,6 +94,8 @@ public class QLearningController extends Controller {
         case 1: leftEngine.setBursting(true); break; 
         case 2: rightEngine.setBursting(true); break;
         case 3: middleEngine.setBursting(true); break;
+       
+
 		}
 		
 		/* TODO: IMPLEMENT THIS FUNCTION */
@@ -106,14 +108,14 @@ public class QLearningController extends Controller {
 		iteration++;
 		
 		if (!paused) {
-			String new_state = StateAndReward.getStateAngle(angle.getValue(), vx.getValue(), vy.getValue());
+			String new_state = StateAndReward.getStateHover(angle.getValue(), vx.getValue(), vy.getValue());
 
 			/* Repeat the chosen action for a while, hoping to reach a new state. This is a trick to speed up learning on this problem. */
 			action_counter++;
 			if (new_state.equals(previous_state) && action_counter < REPEAT_ACTION_MAX) {
 				return;
 			}
-			double previous_reward = StateAndReward.getRewardAngle(previous_angle, previous_vx, previous_vy);
+			double previous_reward = StateAndReward.getRewardHover(previous_angle, previous_vx, previous_vy);
 			action_counter = 0;
 
 			/* The agent is in a new state, do learning and action selection */
@@ -136,32 +138,30 @@ public class QLearningController extends Controller {
 				/* TODO: IMPLEMENT Q-UPDATE HERE! */
 				
 				
-				if (previous_state != null) {
-		            prev_stateaction = previous_state + previous_action;
-		            int prev_N = Ntable.getOrDefault(prev_stateaction, 0);
-		            double prev_Q = Qtable.getOrDefault(prev_stateaction, 0.0);
+	            prev_stateaction = previous_state + previous_action;
+	            int prev_N = Ntable.getOrDefault(prev_stateaction, 0);
+	            double prev_Q = Qtable.getOrDefault(prev_stateaction, 0.0);
 
-		            double maxQ = getMaxActionQValue(new_state);
+	            double maxQ = getMaxActionQValue(new_state);
 
-		            double newQ = prev_Q + alpha(prev_N) * (previous_reward + GAMMA_DISCOUNT_FACTOR * maxQ - prev_Q);
+	            double newQ = prev_Q + alpha(prev_N) * (previous_reward + GAMMA_DISCOUNT_FACTOR * maxQ - prev_Q);
 
-		            Ntable.put(prev_stateaction, prev_N + 1);
-		            Qtable.put(prev_stateaction, newQ);
+	            Ntable.put(prev_stateaction, prev_N + 1);
+	            Qtable.put(prev_stateaction, newQ);
 
-		            // Selecting action based on the new state
-		            int action = selectAction(new_state);
+	            // Selecting action based on the new state
+	            int action = selectAction(new_state);
 
-		            // Perform selected action
-		            performAction(action);
+	            // Perform selected action
+	            performAction(action);
 
-		            // Updating previous action
-		            previous_action = action;
-		        }
+	            // Updating previous action
+	            previous_action = action;
+		        
 
 				/* See top for constants and below for helper functions */
 				
 				
-				int action = selectAction(new_state); /* Make sure you understand how it selects an action */
 
 				performAction(action);
 				
